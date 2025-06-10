@@ -1,7 +1,7 @@
 import dash_cytoscape as cyto
 import dash_bootstrap_components as dbc
 from utils.colours import ColorUtils
-from dash import dcc
+from dash import dcc, html
 
 
 class GraphBuilder:
@@ -23,24 +23,49 @@ class GraphBuilder:
 
         # Build a cytoscape graph per key in clustering_data
         graphs = []
-        for key, value in clustering_data.items():
-            graphs.append(self.create_graph(key, value))
+        for i, (key, value) in enumerate(clustering_data.items()):  # Use enumerate to get sequential index
+            graphs.append(self.create_graph(i, value))  # Pass sequential index instead of cluster_id
 
         rows = []
         cluster_count = 1
-        for graph in graphs:
-            # Create a row with the graph
-            row = dbc.Row(
-                dbc.Col(dcc.Markdown(f"### Cluster {cluster_count}", style={"textAlign":"center"}), width=12),
-                className="mb-2"
-            )
-            rows.append(row)
+        for i, graph in enumerate(graphs):
+            # Create a row with the cluster title and fullscreen button
+            title_row = dbc.Row([
+                dbc.Col([
+                    dbc.Container([
+                        dcc.Markdown(f"### Cluster {cluster_count}", 
+                                   style={"textAlign":"center", "margin": "0", "display": "inline-block"}),
+                        dbc.Button(
+                            "Fullscreen",
+                            id={"type": "fullscreen-btn", "index": i},
+                            color="link",
+                            size="sm",
+                            title="View in fullscreen",
+                            style={
+                                "margin-left": "10px", 
+                                "padding": "2px 6px", 
+                                "font-size": "16px",
+                                "vertical-align": "middle"
+                            }
+                        )
+                    ], style={
+                        "display": "flex", 
+                        "align-items": "center", 
+                        "justify-content": "center"
+                    })
+                ], width=12)
+            ], className="mb-2")
+            rows.append(title_row)
+            
             cluster_count += 1
+            
+            # Create the graph row
             row = dbc.Row(
                 dbc.Col(graph, width=12),
                 className="mb-4"
             )
             rows.append(row)
+            
         return rows
 
     def create_graph(self, cluster_id, ids):
@@ -117,15 +142,9 @@ class GraphBuilder:
         ]
 
         return cyto.Cytoscape(
-            id=f"graph-{cluster_id}",
+            id={"type": "graph", "index": cluster_id},
             elements=elements,
-            # layout={"name": "breadthfirst", "roots": "[id = 'Create Fine']"},
             layout={"name": "dagre", "rankDir": "LR"},
             style={"width": "100%", "height": "200px"},
             stylesheet=stylesheet,
         )
-
-
-
-
-
