@@ -34,7 +34,7 @@ class LayoutManager:
                 marks={i: str(i) for i in range(1, 11, 1)},  # Example marks
                 tooltip={"placement": "bottom", "always_visible": True},
                 included=False,
-                updatemode="drag",
+                updatemode="mouseup",
                 className="dbc",
             )
         ], width=9)
@@ -45,18 +45,14 @@ class LayoutManager:
         )
 
         # Modal tooltip
-        modal_tooltip_div = html.Div(
+        modal_tooltip_div = dbc.Container(
             id="modal-tooltip",
-            children=" ",
+            children="",
             style={
                 "color": "black",
-                "padding": "8px",
-                "border-radius": "4px",
-                "font-size": "12px",
-                "pointer-events": "none",
-                "z-index": "2000",  # Higher z-index for modal
                 "display": "block",
-                "white-space": "pre-line"
+                "minHeight": "30px",
+                "lineHeight": "30px",
             }
         )
 
@@ -66,32 +62,31 @@ class LayoutManager:
                 dbc.ModalTitle(id="modal-title", children=""),
             ]),
             dbc.ModalBody([
-                modal_tooltip_div,  # Add modal tooltip inside modal body
-                html.Div(
+                modal_tooltip_div,
+                dbc.Container(
                     id="modal-graph-container",
-                    style={"height": "75vh", "padding": "10px"},
+                    style={"height": "80vh", "width": "80vh", "padding": "20px"},
                     children=[]
                 )
             ]),
         ],
         id="fullscreen-modal",
         size="xl",
-        is_open=False,
-        style={"max-width": "95vw"})
+        is_open=False,)
 
 
-        tooltip_div = html.Div(
+        tooltip_div = dbc.Container(
             id="tooltip",
-            children=" ",
+            children="",
             style={
+                "position": "fixed",
+                "bottom": "10px",
+                "right": "0px",
+                "zIndex": "1000",
                 "color": "black",
-                "padding": "8px",
-                "border-radius": "4px",
-                "font-size": "12px",
-                "pointer-events": "none",
-                "z-index": "1000",
                 "display": "block",
-                "white-space": "pre-line"
+                "minHeight": "30px",
+                "lineHeight": "30px",
             }
         )
 

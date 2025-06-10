@@ -2,6 +2,7 @@ from dash import Dash, html, dcc, Input, Output, State, ALL, callback_context, n
 from dash.exceptions import PreventUpdate
 import dash_cytoscape as cyto
 import json
+import dash_bootstrap_components as dbc
 
 
 class CallbacksManager:
@@ -113,16 +114,15 @@ class CallbacksManager:
                                 
                                 # Create the fullscreen version with larger dimensions
                                 fullscreen_graph = cyto.Cytoscape(
-                                    id={"type": "fullscreen-graph", "index": clicked_index},
-                                    # Use pattern matching format
-                                    elements=elements,
-                                    layout=layout,
-                                    stylesheet=stylesheet,
-                                    style={"width": "100%", "height": "100%"}
-                                )
+                                                        id={"type": "fullscreen-graph", "index": clicked_index},
+                                                        elements=elements,
+                                                        layout=layout,
+                                                        stylesheet=stylesheet,
+                                                        style={"height": "100%", "width": "100%"},
+                                                    )
 
                                 modal_title = f"Cluster {clicked_index + 1}"
-                                return True, modal_title, fullscreen_graph
+                                return True, modal_title, [fullscreen_graph]
                                 
                             except (KeyError, TypeError) as e:
                                 print(f"Error extracting graph data: {e}")
@@ -143,8 +143,9 @@ class CallbacksManager:
         )
         def display_tooltip(node_data_list, edge_data_list):
             ctx = callback_context
+            tooltip_text = ""
             if not ctx.triggered:
-                return [" ", True]
+                return [tooltip_text, True]
 
             # Get the most recent trigger
             trigger_id = ctx.triggered[0]['prop_id']
@@ -159,8 +160,7 @@ class CallbacksManager:
                 triggered_graph_index = component_id['index']
             except (json.JSONDecodeError, KeyError, IndexError) as e:
                 print(f"Error parsing trigger ID: {e}")
-                return [" ", True]
-            
+                return [tooltip_text, True]
             # Check if the trigger was from a node mouseover
             if "mouseoverNodeData" in trigger_id:
                 # Only check the data from the triggered graph
@@ -177,7 +177,7 @@ class CallbacksManager:
                     tooltip_text = f"{edge_data['source']} → {edge_data['target']}, Weight: {edge_data['weight']}"
                     return [tooltip_text, False]  # Show tooltip and enable interval
 
-            return [" ", True]  # Hide tooltip and disable interval
+            return [tooltip_text, True]  # Hide tooltip and disable interval
 
         # Hide tooltip after interval
         @self.app.callback(
@@ -187,9 +187,10 @@ class CallbacksManager:
             prevent_initial_call=True
         )
         def hide_tooltip_after_delay(n_intervals):
+            tooltip_text = ""
             if n_intervals > 0:
-                return [" ", True]  # Hide tooltip and disable interval
-            return [" ", True]
+                return [tooltip_text, True]  # Hide tooltip and disable interval
+            return [tooltip_text, True]
 
         # Modal tooltip callbacks - listen to fullscreen graphs
         @self.app.callback(
@@ -201,8 +202,9 @@ class CallbacksManager:
         )
         def display_modal_tooltip(node_data_list, edge_data_list):
             ctx = callback_context
+            tooltip_text = ""
             if not ctx.triggered:
-                return [" ", True]
+                return [tooltip_text, True]
 
             trigger_id = ctx.triggered[0]['prop_id']
             
@@ -222,7 +224,7 @@ class CallbacksManager:
                     tooltip_text = f"{edge_data['source']} → {edge_data['target']}, Weight: {edge_data['weight']}"
                     return [tooltip_text, False]
 
-            return [" ", True]
+            return [tooltip_text, True]
 
         # Hide modal tooltip after interval
         @self.app.callback(
@@ -232,6 +234,7 @@ class CallbacksManager:
             prevent_initial_call=True
         )
         def hide_modal_tooltip_after_delay(n_intervals):
+            tooltip_text = ""
             if n_intervals > 0:
-                return [" ", True]
-            return [" ", True]
+                return [tooltip_text, True]
+            return [tooltip_text, True]
