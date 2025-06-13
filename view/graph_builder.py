@@ -161,11 +161,12 @@ class GraphBuilder:
             {
                 "selector": "edge",
                 "style": {
-                    "curve-style": "bezier",
+                    'target-arrow-shape': 'vee',
+                    'curve-style': 'bezier',
+                    'control-point-step-size': 50,
                     "width": f"mapData(log_weight, {log_min_edge}, {log_max_edge}, 1, 8)",
                     "line-color": "#ccc",
                     "target-arrow-color": "#ccc",
-                    "target-arrow-shape": "triangle",
                 },
             },
         ]
